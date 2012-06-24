@@ -1,3 +1,0 @@
-#!/bin/bash
-
-rsync -arvu /home/mdobbs/Tumblr/hangtumblr/game mdobbs@mdocode.com:~/webapps/django/hangtumblr
