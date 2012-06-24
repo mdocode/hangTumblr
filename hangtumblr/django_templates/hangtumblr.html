@@ -32,12 +32,14 @@
 	  var next;
 
 	  function getNextPost(){
+      
 	      request = new XMLHttpRequest();
 	      request.open('GET', "next/", true);
 	      request.onreadystatechange=function() {
 		  if (request.readyState==4) {
-		      console.log(request.responseText);
+		      console.log("returned random post: " +request.responseText);
 		      next = request.responseText;
+		      console.log(next.images);
 		  }
 	      }
 	      request.send();

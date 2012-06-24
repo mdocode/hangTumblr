@@ -27,7 +27,9 @@ def grabRandomPostAsJson(request, name):
     post = Post.objects.filter(blog=Blog.objects.get(url_name=name)).order_by('?')[0]
     tagList = ['#'+string.lower(tag.text) for tag in post.tag_set.all()]
    
-    return render_to_response("test.html", {'baseurl': name, 'images':json.dumps(post.imgUrl), 'tags': json.dumps(tagList)})
+    postDict = {'baseurl': name, 'images':post.imgUrl, 'tags':tagList}
+    #return render_to_response("test.html", {'baseurl': name, 'images':json.dumps(post.imgUrl), 'tags': json.dumps(tagList)})
+    return HttpResponse(json.dumps(postDict))
     
 def start(request):
     return render_to_response("submit.html")
