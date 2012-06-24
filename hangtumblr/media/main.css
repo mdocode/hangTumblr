@@ -1,0 +1,47 @@
+body
+{
+    color: White;
+    background-color: rgb(52, 81, 110);
+    font-family: "Arial Black, Gadget, sans-serif";
+}
+
+
+.center
+{
+       position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+    width: 900px;
+    padding: 20px;
+}
+
+form
+{
+    font-size: 50px;
+}
+
+p
+{
+    margin: 0px;
+    margin-bottom: 5px;
+}
+
+#box
+{
+    background-color: rgb(22, 61, 90);
+    font-size: 50px;
+}
+
+canvas.center
+{
+    float: left;
+}
+
+#instr
+{
+    margin-top:20px;
+    float: right;
+    width: 250px;
+    font-size: 20px;
+}

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <link rel="stylesheet" type="text/css" href="/static/main.css">
+    <script type="text/javascript">
+      
+      function tumblrGame() {
+
+	  // set up game
+
+	  var round = 0;
+	  var imgTransparancy;
+	  var guessed = [];
+	  var image = document.getElementById("cake");
+	  var imgx = 50;
+	  var imgy = 20;
+	  var imgAlpha = 1.0; //opacity of the image
+
+	  var score = 0;
+	  var done = false;
+	  var won = false;
+	  var interval;
+	  var height = 600;
+	  
+	  //import data from server
+	  var imgList = {{ images|safe }};
+	  var tagList = [ {{ t0|safe }}, {{ t1|safe }}, {{ t2|safe }}]
+	  var tags = tagList[round];
+	  	
+
+	  // set up canvas
+	  canvas = document.getElementById("gameCanvas");
+	  ctx = canvas.getContext("2d");
+	  
+	  // register keyboard interaction
+	  window.onkeypress = function guessLetter(e){
+	      evt = document.event? event : e
+	      var letter = evt.keyCode? evt.keyCode : evt.charCode;
+	      if (done){
+		  round++;
+		  startNewRound()
+	      } else {
+		  if (isNewCorrectLetter(String.fromCharCode(letter))){
+		      guessed.push(String.fromCharCode(letter));
+		      imgAlpha += .2;
+		      score += 5;
+		  }
+		  else {
+		      pr = popRandom(show);
+		      pr = popRandom(show);
+		      score -= 2;
+		      if (!pr){
+			  score -=5;
+			  done = true;
+		      }
+		  }
+	      }
+	  }
+	  
+	  
+	  // clipping  functions and vars
+
+	  var clipRes = 5; // dimension for clipping resolution
+	  var clipWidth = 500;
+	  var clipHeight = 600;
+	  var clipSquares;
+	  var col_width = clipWidth/clipRes;
+	  var row_height = clipHeight/clipRes;
+	  var show = []; //which squares of the image should be shown by index. from 0 to clipRes^2
+
+	  function setUp(){
+
+	      var th = tag_height();
+
+	      if (image.height <= 600){
+		  clipHeight = image.height
+	      } else {
+		  clipHeight = 600-th;
+	      }
+	      height = clipHeight + th + 20;
+
+	      row_height = clipHeight/clipRes;
+
+	      for (var i = 0; i < (clipRes*clipRes); i++){
+		  show.push(i);
+	      }
+	      
+	  }
+
+	  function popRandom(list){
+	      return list.length ? list.splice(Math.floor(Math.random() * list.length), 1):
+		  null;
+	  }
+
+	  function clipRect(r,c){
+	      // returns an object with the coordinates x and y for the upper left corn and the width and height of a rectangle
+	      var col_width = clipWidth/clipRes;
+	      var row_height = clipHeight/clipRes;
+	      
+	      var rect = {};
+	      rect.x = c*col_width;
+	      rect.y = r*row_height;
+	      rect.width = col_width;
+	      rect.height = row_height;
+	      return rect;	      
+	  }
+
+
+	  // test
+	   //alert(r);
+	  //untest	  
+	  
+	  function clipPath(){
+
+	      // creates a path containing the rectangles for the parts of the image that are shown
+	      ctx.beginPath();
+	       for (var i = 0; i < show.length; i++){
+		   var r = clipRect(parseInt(show[i]/clipRes), show[i]%clipRes); 
+		   ctx.rect(r.x, r.y, r.width, r.height);
+	       }
+
+	      ctx.closePath()
+	  }
+	  // end clipping functions
+	  
+	  // start main game loop
+	  
+	  image = new Image();
+	  
+	  image.onload = function(){
+	      setUp();
+	      start();
+	  }
+	  image.src = imgList[round];
+
+	  function startNewRound(){
+	      tags = tagList[round];
+	      done = false;
+	      won = false;
+	      guessed = [];
+	      image.src = imgList[round];
+	      show = [];
+	  }
+
+	  function start(){
+	      interval = setInterval(gameLoop, 16);
+	  }
+
+	  function gameLoop(){
+	      if(!done){
+		  draw();
+		  if (imgAlpha > .01)
+		      imgAlpha -= .001;
+	      } 
+	      else{
+		  drawLost();
+		  clearInterval(interval);
+	      }
+	  }
+	  
+	  function isNewCorrectLetter(letter){
+	      if (guessed.indexOf(letter) > -1){
+		  return false;
+	      }
+	      for (var t = 0; t < tags.length; t++){
+		  if (tags[t].indexOf(letter) > -1)
+		      return true;
+	      }
+	      return false;
+	  }
+
+	  function isAlpha(letter){
+	      if (letter.charCodeAt(0) < 65 || (letter.charCodeAt(0) > 90) && 
+		  (letter.charCodeAt(0) < 97) || letter.charCodeAt(0) > 122)
+		  return true;
+	      else
+		  return false;
+	  }
+	  
+	  function whiteLetter(letter){
+	      if (isAlpha(letter))
+		  return true;	      
+	      if (guessed.indexOf(letter) > -1)
+		  return true;
+	      else
+		  return false;
+	  }
+
+	  function tag_height(){
+	      var height = 30;
+	      var textPosX = 50;
+	      
+	      for (var i in tags) {
+		  tag = tags[i];
+		  width = ctx.measureText(tag).width;
+		  var infos = [tag, width, textPosX, height];
+//		  alert(infos);
+		  if ((textPosX + width) > 500) {
+		      textPosX = 50;
+		      oldX = textPosX;
+		      height += 30;
+		  } else {
+		      textPosX += width;
+		  }
+
+		  if (width > 450){
+		      linebreak = true;
+		      oldY = height;
+		      for (var w = width; w >0; w++){
+			  height +=30;
+			  w -=500;
+			  if (w < 500)
+			      textPosX = w;
+		      }
+		  }
+		  textPosX += 10;
+	      }
+	      return height;
+	  }
+
+	  function draw() {
+	      //ctx.clearRect(0, 0, canvas.width, canvas.height);
+	      canvas.width = canvas.width;
+	      ctx.fillStyle = "white";
+	      ctx.fillRect(0, 0, canvas.width, height);
+	      ctx.save();
+	      ctx.globalAlpha = imgAlpha;
+	      clipPath();
+	      ctx.clip()
+	      ctx.drawImage(image, imgx, imgy);
+	      ctx.restore()
+	      ctx.globalAlpha = 1.0;
+
+	      var textPosX = 50;
+	      var textPosY = clipHeight + 30;
+	      var blackwrite = false;
+	      var linebreak = false;
+
+	      function writeLetters(tag){
+		  for (var t = 0; t < tag.length; t++){
+		      if (whiteLetter(tag[t]))
+			  ctx.fillStyle = "white";
+		      else {
+			  ctx.fillStyle = "black";
+			  blackwrite = true;
+		      }
+		      ctx.fillText(tag[t], textPosX, textPosY);
+		      width = ctx.measureText(tag[t]).width;
+		      if ((textPosX + width) > 500){
+			  textPosX = 50;
+			  textPosY += 30;
+		      } else {
+			  textPosX =  textPosX + width;
+		      }
+		  }
+		  ctx.fillStyle = "black";
+	      }
+
+	      
+	      // draw tags
+	      ctx.font = '24px Sans-Serif';
+
+	      for (var i in tags) {
+		  var oldX = textPosX;
+		  tag = tags[i];
+		  ctx.fillStyle = "black";
+		  width = ctx.measureText(tag).width;
+		  if ((textPosX + width) > 500) {
+		      textPosX = 50;
+		      oldX = textPosX;
+		      textPosY += 30;
+		  }
+		  if (width > 450){
+		      linebreak = true;
+		      oldY = textPosY;
+		      for (var w = width; w >0; w++){
+			  ctx.fillRect(oldX, textPosY-20, Math.min(500,w+50), 24);
+			  textPosY +=30;
+			  w -=500;
+		      }
+		      textPosY = oldY;
+		  } else {
+		      ctx.fillRect(oldX, textPosY-20, width, 24);
+		  }
+		  writeLetters(tag);
+		  linebreak = false;
+		  textPosX += 10;
+	      }
+	      if (!blackwrite){
+		  won = true;
+		  done = true;
+	      }
+	      
+	  }
+	  
+	  function drawLost() {
+	      ctx.clearRect(0, 0, canvas.width, canvas.height);
+	      ctx.fillStyle = "gray";
+	      ctx.fillRect(0, 0, canvas.width, canvas.height);
+	      if (won){
+		  ctx.save();
+		  draw();
+		  ctx.restore();
+		  setUp()
+		  ctx.fillStyle = "white";
+		  ctx.strokeStyle = "black";
+		  if (round < 2){
+		      ctx.fillText("CORRECT!", 100, 100);
+		      ctx.strokeText("CORRECT!", 100, 100);
+		      ctx.fillText("Press any key to start next round", 100, 150);
+		      ctx.strokeText("Press any key to start next round", 100, 150);
+		  } else {
+		      ctx.fillText("YAY YOU WIN!", 100, 100);
+		      ctx.strokeText("YAY YOU WIN!", 100, 100);
+		  }
+	      }
+	      else {
+		  ctx.fillStyle = "white";
+		  ctx.strokeStyle = "black";
+		  ctx.fillText("YOU LOSE", 100, 100);
+		  ctx.strokeText("YOU LOSE", 100, 100);
+	      }
+	      scoreText = "Score: "+score;
+	      ctx.fillText(scoreText, 100, 200);
+	      ctx.strokeText(scoreText, 100, 200);
+	  }	  
+	  gameLoop();
+      }
+
+    </script>
+  </head>
+  
+  <body onload="tumblrGame()">
+    <div class="center" id="box">
+      <p>Hangtumblr</p>
+
+    <img id="cake" src="" style="display: none" />
+    <canvas id="gameCanvas" tabindex="1" width="600" height="650">
+    </canvas>
+    <div id="instr">
+      <p> Type letters to guess what tags accompany this image!</p>
+      <p> Every wrong guess destroys more of the image</p>
+      <p> Guess all the tags before the image disappears to go on the the next round
+    </div>
+  </body>
+
+</html>

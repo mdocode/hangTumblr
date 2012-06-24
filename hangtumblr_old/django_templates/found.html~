@@ -1,0 +1,11 @@
+<html>
+<head>
+    <title>FOUND!</title>
+</head>
+<body>
+  Ooh yeah we found the blog {{ blogUrl }}.tumblr.com! Let's play.
+    <form action="/game/{{ blogUrl }}" method="get">
+        <input type="submit" value="Play Game">
+    </form>
+</body>
+</html>

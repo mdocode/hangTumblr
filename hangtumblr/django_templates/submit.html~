@@ -1,0 +1,29 @@
+<html>
+<head>
+    <title>HangTumblr</title>
+    <script type="text/javascript">
+
+      function loading(){
+	  var image = document.getElementById("loadimg");
+	  image.style.display = 'inline';
+	  document.getElementById("tumblrForm").style.display="none";
+	  return true;
+      }
+    </script>
+    <link rel="stylesheet" type="text/css" href="static/main.css">
+</head>
+<body>
+  <div class="center">
+    <form id="tumblrForm" action="/search/" method="post" onSubmit="return loading()"> 
+        <input type="text" name="blogName" id="inputBox"> .tumblr.com<br/>
+        <input type="submit" value="Grab Tumblr!">
+    </form>
+    <div id="loadimg" style="display: none;">
+    <img src="static/loading.gif"></img><h2>Loading....</h2>
+    <ul>
+      <li />If the tumblr blog you are adding isn't already in our database, this request may take a while. Let it load.
+      <li />DO NOT REFRESH 
+      </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+body
+{
+    color: White;
+    background-color: rgb(52, 81, 110);
+    font-family: "Arial Black, Gadget, sans-serif";
+}
