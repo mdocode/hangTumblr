@@ -10,7 +10,7 @@
 	  // set up game
 
 	  var round = 0;
-	  var max_rounds = 2;
+	  var max_rounds = 5;
 	  var guessed = [];
 	  
 	  var difficulty = 2;
@@ -38,8 +38,11 @@
 	      request.onreadystatechange=function() {
 		  if (request.readyState==4) {
 		      console.log("returned random post: " +request.responseText);
-		      next = request.responseText;
-		      console.log(next.images);
+		      next = JSON.parse(request.responseText);
+		      imgList.push(next.images);
+		      tagList.push(next.tags);
+		      console.log(tagList);
+		      console.log(imgList);
 		  }
 	      }
 	      request.send();
@@ -55,8 +58,12 @@
 	      evt = document.event? event : e
 	      var letter = evt.keyCode? evt.keyCode : evt.charCode;
 	      if (done){
-		  round++;
-		  startNewRound()
+		  if (won){
+		      round++;
+		      startNewRound()
+		  } else {
+		      window.location = "http://mdocode.com/";
+		  }
 	      } else {
 		  if (isNewCorrectLetter(String.fromCharCode(letter))){
 		      guessed.push(String.fromCharCode(letter));
@@ -184,7 +191,7 @@
 	      var textPosY = 100;
 	      var xstep = 10;
 	      var ystep = 0;
-	      var numtries = Math.floor((clipRes*clipRes)/difficulty);
+	      var numtries = Math.ceil((clipRes*clipRes)/difficulty);
 	      var st;
 	      var displayRound = round+1
 	      var anim = function animate(){
