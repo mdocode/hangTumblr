@@ -6,10 +6,12 @@ import hangblogs
 import json
 import string
 from django.core import serializers
+from minidetector import detect_mobile
 
 def hello(request, name=""):
     return HttpResponse("Hello world")
 
+@detect_mobile
 def game(request, name):
     posts = Post.objects.filter(blog=Blog.objects.get(url_name=name)).order_by('?')[:3]
     imgs = [post.imgUrl for post in posts]
@@ -21,7 +23,10 @@ def game(request, name):
     t1 = json.dumps(t[1])
     t2 = json.dumps(t[2])
 
-    return render_to_response("hangtumblr.html", {'baseurl':name, 'images':json_imgs, 't1':t1, 't2':t2, 't0':t0})
+    if request.mobile:
+        return render_to_response("hangtumblr_mobile.html", {'baseurl':name, 'images':json_imgs, 't1':t1, 't2':t2, 't0':t0})
+    else:
+        return render_to_response("hangtumblr.html", {'baseurl':name, 'images':json_imgs, 't1':t1, 't2':t2, 't0':t0})
 
 def grabRandomPostAsJson(request, name):
     post = Post.objects.filter(blog=Blog.objects.get(url_name=name)).order_by('?')[0]

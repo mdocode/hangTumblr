@@ -112,7 +112,7 @@
 	  function set_canvas_and_image_sizes(){
 	      // sets up the canvas size and clipping based on the height of the image; sets it up to draw the whole image
 
-	      var th = tag_height();
+	      var th = tag_height(); // height of all tags
 
 	      if (image.height <= 600){
 		  clipHeight = image.height
@@ -120,7 +120,7 @@
 		  clipHeight = 600-th;
 	      }
 	      height = clipHeight + th + 20;
-
+	      $('#gameCanvas').height(height+10);
 	      row_height = clipHeight/clipRes;
 
 	      for (var i = 0; i < (clipRes*clipRes); i++){
@@ -253,12 +253,14 @@
 
 	  function initialize_keyboard(){
 	      $('#keyboard').keyboard({
-		  layout : 'qwerty',
-		 
+		  layout : 'custom',
+		  customLayout : { 'default': ['a b c d e f g h i j', 
+					       'k l m n o p q r s',
+					       't u v w x y z {a}'] },
 		  position : {
-		      of : $('#gameCanvas'),
-		      my : 'center bottom',
-		      at : 'center top',
+		      of : null,
+		      my : 'center top',
+		      at : 'center bottom',
 		      at2 : 'center top',
 		  },
 
@@ -277,8 +279,8 @@
 		  change : function(e, keyboard, el){
 		      input = el.value;
 		      console.log(input);
-		      console.log(input.substr(input.length-1));
-		      guessLetter(input.substr(input.length-1));
+		      console.log(input.substr(0, 1));
+		      guessLetter(input.substr(0, 1));
 		  }
 	      });
 
@@ -428,11 +430,8 @@
     <img id="cake" src="" style="display: none" />
     <canvas id="gameCanvas" tabindex="1" width="600" height="650">
     </canvas>
-    <textarea id="keyboard" style="display: none;" placeholder="Enter Text..."></textarea>
-    <div id="instr">
-      <p> Type letters to guess what tags accompany this image!</p>
-      <p> Every wrong guess destroys more of the image</p>
-      <p> Guess all the tags before the image disappears to go on the the next round
+    <br>
+    <textarea id="keyboard"  placeholder="Enter Text..." style="margin-left: 156px;"></textarea>
     </div>
   </body>
 

@@ -53,10 +53,16 @@
 	  ctx = canvas.getContext("2d");
 	  
 	  // register keyboard interaction
-	  window.onkeypress = function guessLetter(e){
+	  window.onkeypress = function getEventFromKeyboard(e){
 	      
 	      evt = document.event? event : e
 	      var letter = evt.keyCode? evt.keyCode : evt.charCode;
+
+	      guessLetter(letter);
+	      
+	  }
+	  
+	  function guessLetter(letter){
 	      if (done){
 		  if (won){
 		      round++;
@@ -82,7 +88,6 @@
 		  }
 	      }
 	  }
-	  
 	  function isNewCorrectLetter(letter){   
 	      if (guessed.indexOf(letter) > -1){
 		  return false;
@@ -372,6 +377,10 @@
       }
 
     </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.js"></script>
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+
   </head>
   
   <body onload="tumblrGame()">
